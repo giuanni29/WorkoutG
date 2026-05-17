@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Workout Tracker Pro Silent</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --accent: #00adb5; 
+            --prog-accent: #ff9800; 
+            --check-green: #4caf50;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            gap: 10px;
+        }
+        
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            flex: 1;
+        }
+
+        h2 { color: var(--accent); margin: 0; font-size: 1.2em; white-space: nowrap; }
+
+        .nav-btn { 
+            background: #2a2a2a; 
+            border: 1px solid var(--accent); 
+            color: var(--accent); 
+            padding: 6px 8px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 0.75em;
+        }
+        
+        .prog-btn { 
+            background: #2a2a2a; 
+            border: 1px solid var(--prog-accent); 
+            color: var(--prog-accent); 
+            padding: 6px 8px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 0.7em;
+        }
+        .prog-btn.active { background: var(--prog-accent); color: #000; }
+
+        .exercise-card {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .exercise-info { display: flex; flex-direction: column; }
+        .exercise-name { font-weight: bold; font-size: 1.05em; transition: color 0.3s ease; }
+        .prog-mode-text { color: var(--prog-accent) !important; }
+        .last-weight { font-size: 0.8em; color: #888; margin-top: 2px; }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type="number"] {
+            width: 75px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: var(--accent); 
+            padding: 10px 5px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        input.is-confirmed {
+            background-color: var(--prog-accent) !important;
+            color: #000 !important;
+            border-color: var(--prog-accent) !important;
+        }
+
+        .check-btn {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: var(--check-green);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .save-btn {
+            background: var(--accent);
+            color: white; border: none; padding: 18px; border-radius: 12px;
+            width: 100%; font-weight: bold; font-size: 1.1em; margin-top: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .save-btn.success {
+            background-color: var(--check-green);
+        }
+
+        #history-view { display: none; }
+        .table-wrapper { width: 100%; overflow-x: auto; background: var(--card-bg); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; min-width: 450px; }
+        th, td { padding: 12px 8px; border-bottom: 1px solid #333; text-align: center; font-size: 0.85em; }
+        th { color: var(--accent); background: #252525; }
+        .date-col { font-weight: bold; text-align: left; padding-left: 12px; background: #252525; }
+
+        .reset-btn { margin-top: 40px; color: #ff4444; background: none; border: 1px solid #ff4444; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="main-view">
+        <div class="header">
+            <div class="header-left">
+                <h2>Workout</h2>
+                <button id="progToggle" class="prog-btn" onclick="toggleProgressive()">Progressiv +2.5</button>
+            </div>
+            <button class="nav-btn" onclick="showHistory()">📅 Übersicht</button>
+        </div>
+        <div id="exercise-list"></div>
+        <button id="saveBtn" class="save-btn" onclick="saveWorkout()">Training speichern</button>
+    </div>
+
+    <div id="history-view">
+        <div class="header">
+            <h2>Verlauf</h2>
+            <button class="nav-btn" onclick="showMain()">Zurück</button>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr id="h-head"></tr></thead>
+                <tbody id="h-body"></tbody>
+            </table>
+        </div>
+        <button id="clearBtn" class="reset-btn" onclick="clearData()">Verlauf leeren</button>
+    </div>
+
+    <script>
+        let exercises = ['Bankdrücken', 'Curls', 'Trizeps', 'Rudern', 'Butterfly revers', 'Butterfly'];
+        let isProgressive = false;
+        
+        if(localStorage.getItem('exerciseOrder')) exercises = JSON.parse(localStorage.getItem('exerciseOrder'));
+        let workoutHistory = JSON.parse(localStorage.getItem('workoutHistory')) || [];
+        let lastWeights = JSON.parse(localStorage.getItem('lastWeights')) || {};
+
+        function toggleProgressive() {
+            isProgressive = !isProgressive;
+            document.getElementById('progToggle').classList.toggle('active');
+            renderExercises();
+        }
+
+        function confirmEntry(idx) {
+            const input = document.getElementById(`input-${idx}`);
+            if (input.value.trim() === "" && input.placeholder && input.placeholder !== '--') {
+                input.value = input.placeholder;
+            }
+            if (input.value.trim() !== "") {
+                if (isProgressive) input.classList.add('is-confirmed');
+            }
+        }
+
+        function renderExercises() {
+            const list = document.getElementById('exercise-list');
+            list.innerHTML = '';
+            exercises.forEach((ex, idx) => {
+                const lw = parseFloat(lastWeights[ex]) || 0;
+                const displayLw = lastWeights[ex] || '--';
+                const placeholderValue = (isProgressive && lw > 0) ? (lw + 2.5) : displayLw;
+
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                const nameClass = isProgressive ? 'exercise-name prog-mode-text' : 'exercise-name';
+
+                card.innerHTML = `
+                    <div class="exercise-info">
+                        <span class="${nameClass}">${ex}</span>
+                        <span class="last-weight">Zuletzt: ${displayLw} kg</span>
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="input-${idx}" class="w-input" 
+                               oninput="this.classList.remove('is-confirmed')"
+                               data-name="${ex}" value="" placeholder="${placeholderValue}" 
+                               step="0.5" inputmode="decimal">
+                        <button class="check-btn" onclick="confirmEntry(${idx})">✔</button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function saveWorkout() {
+            const btn = document.getElementById('saveBtn');
+            const date = new Date().toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'});
+            const inputs = document.querySelectorAll('.w-input');
+            let session = { date: date, weights: {} };
+            let hasEntry = false;
+
+            inputs.forEach(i => {
+                const name = i.getAttribute('data-name');
+                const val = i.value.trim();
+                if(val !== "") {
+                    session.weights[name] = val;
+                    lastWeights[name] = val;
+                    hasEntry = true;
+                } else {
+                    session.weights[name] = "-";
+                }
+                i.value = '';
+                i.classList.remove('is-confirmed');
+            });
+
+            if(!hasEntry) return;
+
+            workoutHistory.unshift(session);
+            localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory));
+            localStorage.setItem('lastWeights', JSON.stringify(lastWeights));
+            
+            // Visuelles Feedback statt Alert
+            btn.classList.add('success');
+            btn.innerText = "Gespeichert! ✓";
+            
+            setTimeout(() => {
+                btn.classList.remove('success');
+                btn.innerText = "Training speichern";
+                renderExercises();
+            }, 1000);
+        }
+
+        function showHistory() {
+            document.getElementById('main-view').style.display = 'none';
+            document.getElementById('history-view').style.display = 'block';
+            const head = document.getElementById('h-head');
+            head.innerHTML = '<th>Datum</th>' + exercises.map(ex => `<th>${ex.substring(0,4)}.</th>`).join('');
+            const body = document.getElementById('h-body');
+            body.innerHTML = '';
+            workoutHistory.forEach(s => {
+                let row = `<tr><td class="date-col">${s.date}</td>`;
+                exercises.forEach(ex => {
+                    let val = (s.weights && s.weights[ex]) ? s.weights[ex] : '-';
+                    row += `<td>${val}</td>`;
+                });
+                row += '</tr>';
+                body.innerHTML += row;
+            });
+        }
+
+        function showMain() {
+            document.getElementById('history-view').style.display = 'none';
+            document.getElementById('main-view').style.display = 'block';
+            renderExercises();
+        }
+
+        function clearData() {
+            if(confirm("Verlauf löschen?")) {
+                workoutHistory = [];
+                localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory));
+                showHistory();
+            }
+        }
+
+        renderExercises();
+    </script>
+</body>
+</html>
