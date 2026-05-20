@@ -1,598 +1,412 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Workout Tracker Pro</title>
-    <style>
-        :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --accent: #00adb5;
-            --orange: #ff9800;
-            --green: #4caf50;
-            --red: #ff4444;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: sans-serif;
-            background: var(--bg);
-            color: #fff;
-            padding: 15px;
-            overflow-x: hidden;
-        }
-        /* HEADER */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 8px;
-        }
-        .header h2 { color: var(--accent); font-size: 1.2em; white-space: nowrap; }
-        .hbtns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-        .btn-outline {
-            background: #2a2a2a;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 7px 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.75em;
-            white-space: nowrap;
-        }
-        .btn-prog {
-            background: #2a2a2a;
-            border: 1px solid var(--orange);
-            color: var(--orange);
-            padding: 7px 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.75em;
-            white-space: nowrap;
-        }
-        .btn-prog.active { background: var(--orange); color: #000; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Workout Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#121212;color:#fff;font-family:sans-serif;padding:12px;}
+h2{color:#00adb5;font-size:1.15em;}
+.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:6px;}
+.row .btns{display:flex;gap:6px;}
+button{cursor:pointer;font-family:sans-serif;}
+.b-teal{background:#2a2a2a;border:1px solid #00adb5;color:#00adb5;padding:7px 10px;border-radius:8px;font-size:0.75em;font-weight:bold;}
+.b-orange{background:#2a2a2a;border:1px solid #ff9800;color:#ff9800;padding:7px 10px;border-radius:8px;font-size:0.75em;font-weight:bold;}
+.b-orange.on{background:#ff9800;color:#000;}
+.card{background:#1e1e1e;border-radius:12px;padding:12px;margin-bottom:10px;}
+.card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.ex-name{font-weight:bold;font-size:1em;color:#fff;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ex-name.prog{color:#ff9800;}
+.badge{background:#00adb5;color:#000;font-size:0.65em;font-weight:bold;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;margin-left:5px;}
+.sub{font-size:0.78em;color:#888;margin-top:3px;}
+.inp-row{display:flex;gap:5px;align-items:center;}
+input[type=number]{width:70px;background:#2a2a2a;border:1px solid #555;color:#00adb5;padding:9px 4px;border-radius:8px;text-align:center;font-size:1.1em;font-weight:bold;outline:none;}
+.b-check{background:#2a2a2a;border:1px solid #555;color:#4caf50;padding:9px 13px;border-radius:8px;font-size:1em;}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
+.dot{width:30px;height:24px;border-radius:5px;background:#2a2a2a;border:1px solid #444;display:flex;align-items:center;justify-content:center;font-size:0.62em;color:#666;font-weight:bold;}
+.dot.g{background:#4caf50;border-color:#4caf50;color:#000;}
+.dot.o{background:#ff9800;border-color:#ff9800;color:#000;}
+.b-save{width:100%;background:#00adb5;color:#fff;border:none;padding:16px;border-radius:12px;font-size:1.1em;font-weight:bold;margin-top:8px;}
+.b-save.ok{background:#4caf50;}
+.b-reset{width:100%;background:none;border:1px solid #ff4444;color:#ff4444;padding:12px;border-radius:8px;font-weight:bold;margin-top:30px;}
 
-        /* EXERCISE CARD */
-        .ex-card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-        }
-        .ex-info { flex: 1; min-width: 0; }
-        .name-row { display: flex; align-items: center; gap: 6px; }
-        .ex-name {
-            font-weight: bold;
-            font-size: 1em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 130px;
-        }
-        .ex-name.prog { color: var(--orange); }
-        .badge {
-            background: var(--accent);
-            color: #000;
-            font-size: 0.65em;
-            font-weight: bold;
-            border-radius: 50%;
-            width: 20px; height: 20px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .badge.hide { display: none; }
-        .last-w { font-size: 0.78em; color: #888; margin-top: 3px; }
+/* manage */
+.m-item{background:#1e1e1e;border-radius:10px;padding:11px 13px;margin-bottom:9px;display:flex;align-items:center;gap:8px;}
+.m-item span{flex:1;font-size:0.95em;}
+.b-edit{background:#2a2a2a;border:1px solid #00adb5;color:#00adb5;padding:6px 9px;border-radius:6px;font-size:0.72em;}
+.b-del{background:#2a2a2a;border:1px solid #ff4444;color:#ff4444;padding:6px 9px;border-radius:6px;font-size:0.72em;}
+.add-row{display:flex;gap:8px;margin-top:14px;}
+.add-row input[type=text]{flex:1;background:#2a2a2a;border:1px solid #555;color:#fff;padding:10px;border-radius:8px;font-size:0.9em;outline:none;}
+.b-add{background:#00adb5;color:#000;border:none;padding:10px 13px;border-radius:8px;font-weight:bold;}
 
-        .input-row { display: flex; gap: 5px; align-items: center; }
-        input[type="number"] {
-            width: 72px;
-            background: #2a2a2a;
-            border: 1px solid #555;
-            color: var(--accent);
-            padding: 10px 4px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 1.1em;
-            font-weight: bold;
-            outline: none;
-        }
-        .check-btn {
-            background: #2a2a2a;
-            border: 1px solid #555;
-            color: var(--green);
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-        }
+/* history */
+.tbl{width:100%;overflow-x:auto;background:#1e1e1e;border-radius:12px;}
+table{width:100%;border-collapse:collapse;min-width:400px;}
+th,td{padding:9px 6px;border-bottom:1px solid #2a2a2a;text-align:center;font-size:0.8em;}
+th{color:#00adb5;background:#252525;}
+.dc{text-align:left;padding-left:11px;font-weight:bold;background:#252525;}
+td.ml{font-size:0.7em;line-height:1.7;}
 
-        /* SET DOTS */
-        .dots-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        .dot {
-            width: 30px; height: 26px;
-            border-radius: 6px;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.65em;
-            color: #666;
-            font-weight: bold;
-        }
-        .dot.done { background: var(--green); border-color: var(--green); color: #000; }
-        .dot.prog-done { background: var(--orange); border-color: var(--orange); color: #000; }
+/* modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:99;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.mbox{background:#1e1e1e;border:1px solid #333;border-radius:14px;padding:22px;width:88%;max-width:310px;}
+.mbox h3{color:#00adb5;margin-bottom:13px;font-size:1em;}
+.mbox input[type=text]{width:100%;background:#2a2a2a;border:1px solid #555;color:#fff;padding:11px;border-radius:8px;font-size:1em;outline:none;margin-bottom:13px;}
+.mrow{display:flex;gap:9px;}
+.mrow button{flex:1;padding:11px;border-radius:8px;font-weight:bold;border:none;font-size:0.9em;}
+.mok{background:#00adb5;color:#000;}
+.mcancel{background:#333;color:#aaa;}
 
-        /* SAVE BTN */
-        .save-btn {
-            width: 100%;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 18px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-top: 10px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .save-btn.ok { background: var(--green); }
-
-        /* VIEWS */
-        #view-main, #view-manage, #view-history { display: none; }
-        #view-main { display: block; }
-
-        /* MANAGE */
-        .manage-item {
-            background: var(--card);
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .manage-item span { flex: 1; font-size: 0.95em; }
-        .btn-edit {
-            background: #2a2a2a;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.72em;
-            cursor: pointer;
-        }
-        .btn-del {
-            background: #2a2a2a;
-            border: 1px solid var(--red);
-            color: var(--red);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.72em;
-            cursor: pointer;
-        }
-        .add-row { display: flex; gap: 8px; margin-top: 16px; }
-        .add-row input[type="text"] {
-            flex: 1;
-            background: #2a2a2a;
-            border: 1px solid #555;
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9em;
-            outline: none;
-        }
-        .btn-add {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* HISTORY */
-        .tbl-wrap { overflow-x: auto; background: var(--card); border-radius: 12px; }
-        table { width: 100%; border-collapse: collapse; min-width: 420px; }
-        th, td { padding: 10px 7px; border-bottom: 1px solid #2a2a2a; text-align: center; font-size: 0.82em; }
-        th { color: var(--accent); background: #252525; }
-        .dcol { font-weight: bold; text-align: left; padding-left: 12px; background: #252525; }
-        td.multi { font-size: 0.72em; line-height: 1.7; }
-        .reset-btn {
-            margin-top: 30px;
-            color: var(--red);
-            background: none;
-            border: 1px solid var(--red);
-            padding: 12px;
-            width: 100%;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* MODAL */
-        .modal-bg {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-bg.open { display: flex; }
-        .modal-box {
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 14px;
-            padding: 22px;
-            width: 88%;
-            max-width: 320px;
-        }
-        .modal-box h3 { color: var(--accent); margin-bottom: 14px; font-size: 1em; }
-        .modal-box input[type="text"] {
-            width: 100%;
-            background: #2a2a2a;
-            border: 1px solid #555;
-            color: #fff;
-            padding: 11px;
-            border-radius: 8px;
-            font-size: 1em;
-            outline: none;
-            margin-bottom: 14px;
-        }
-        .modal-btns { display: flex; gap: 10px; }
-        .modal-btns button { flex: 1; padding: 11px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.9em; }
-        .mbtn-ok { background: var(--accent); color: #000; }
-        .mbtn-cancel { background: #333; color: #aaa; }
-    </style>
+/* pages */
+.page{display:none;}
+.page.active{display:block;}
+</style>
 </head>
 <body>
 
-<!-- MAIN -->
-<div id="view-main">
-    <div class="header">
-        <h2>Workout</h2>
-        <div class="hbtns">
-            <button id="progBtn" class="btn-prog" onclick="toggleProg()">Progressiv +2.5</button>
-            <button class="btn-outline" onclick="goManage()">✏️ Übungen</button>
-            <button class="btn-outline" onclick="goHistory()">📅 Verlauf</button>
-        </div>
+<!-- MAIN PAGE -->
+<div id="pgMain" class="page active">
+  <div class="row">
+    <h2>Workout</h2>
+    <div class="btns">
+      <button id="btnProg" class="b-orange" onclick="toggleProg()">Progressiv +2.5</button>
+      <button class="b-teal" onclick="goPage('pgManage')">✏️ Übungen</button>
+      <button class="b-teal" onclick="openHistory()">📅 Verlauf</button>
     </div>
-    <div id="ex-list"></div>
-    <button id="saveBtn" class="save-btn" onclick="saveWorkout()">Training speichern</button>
+  </div>
+  <div id="exList"></div>
+  <button id="btnSave" class="b-save" onclick="saveWorkout()">Training speichern</button>
 </div>
 
-<!-- MANAGE -->
-<div id="view-manage">
-    <div class="header">
-        <h2>Übungen verwalten</h2>
-        <button class="btn-outline" onclick="goMain()">← Zurück</button>
-    </div>
-    <div id="manage-list"></div>
-    <div class="add-row">
-        <input type="text" id="newExName" placeholder="Neue Übung..." maxlength="28">
-        <button class="btn-add" onclick="addEx()">+ Hinzufügen</button>
-    </div>
+<!-- MANAGE PAGE -->
+<div id="pgManage" class="page">
+  <div class="row">
+    <h2>Übungen verwalten</h2>
+    <button class="b-teal" onclick="goPage('pgMain')">← Zurück</button>
+  </div>
+  <div id="mList"></div>
+  <div class="add-row">
+    <input type="text" id="newName" placeholder="Neue Übung..." maxlength="28">
+    <button class="b-add" onclick="addEx()">+ Hinzufügen</button>
+  </div>
 </div>
 
-<!-- HISTORY -->
-<div id="view-history">
-    <div class="header">
-        <h2>Verlauf</h2>
-        <button class="btn-outline" onclick="goMain()">← Zurück</button>
-    </div>
-    <div class="tbl-wrap">
-        <table>
-            <thead><tr id="h-head"></tr></thead>
-            <tbody id="h-body"></tbody>
-        </table>
-    </div>
-    <button class="reset-btn" onclick="clearHistory()">Verlauf leeren</button>
+<!-- HISTORY PAGE -->
+<div id="pgHistory" class="page">
+  <div class="row">
+    <h2>Verlauf</h2>
+    <button class="b-teal" onclick="goPage('pgMain')">← Zurück</button>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr id="hHead"></tr></thead>
+      <tbody id="hBody"></tbody>
+    </table>
+  </div>
+  <button class="b-reset" onclick="clearLog()">Verlauf leeren</button>
 </div>
 
 <!-- RENAME MODAL -->
-<div id="modal" class="modal-bg">
-    <div class="modal-box">
-        <h3>Übung umbenennen</h3>
-        <input type="text" id="renameVal" maxlength="28" placeholder="Neuer Name...">
-        <div class="modal-btns">
-            <button class="mbtn-cancel" onclick="closeModal()">Abbrechen</button>
-            <button class="mbtn-ok" onclick="doRename()">Speichern</button>
-        </div>
+<div id="modal" class="overlay">
+  <div class="mbox">
+    <h3>Umbenennen</h3>
+    <input type="text" id="renameInp" maxlength="28">
+    <div class="mrow">
+      <button class="mcancel" onclick="closeModal()">Abbrechen</button>
+      <button class="mok" onclick="doRename()">Speichern</button>
     </div>
+  </div>
 </div>
 
 <script>
-    // ── State ──
-    var DEFAULTS = ['Bankdrücken','Curls','Trizeps','Rudern','Butterfly revers','Butterfly'];
-    var MAX_SETS = 9;
+// ── Storage helpers ──
+function lsGet(k, fallback) {
+  try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch(e) { return fallback; }
+}
+function lsSet(k, v) {
+  try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {}
+}
 
-    function loadExercises() {
-        try {
-            var s = localStorage.getItem('exerciseOrder');
-            if (s) { var a = JSON.parse(s); if (Array.isArray(a) && a.length > 0) return a; }
-        } catch(e) {}
-        return DEFAULTS.slice();
+// ── App state ──
+var DEFAULTS = ['Bankdrücken','Curls','Trizeps','Rudern','Butterfly revers','Butterfly'];
+var MAX_SETS = 9;
+
+var exList     = lsGet('exList', DEFAULTS.slice());
+var wLog       = lsGet('wLog', []);
+var lastW      = lsGet('lastW', {});
+var isProg     = false;
+var sets       = {};   // { exName: ['60','65',...] }
+var reIdx      = null;
+
+function initSets() {
+  for (var i = 0; i < exList.length; i++) {
+    if (!sets[exList[i]]) sets[exList[i]] = [];
+  }
+}
+
+// ── Page navigation ──
+function goPage(id) {
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  if (id === 'pgMain') { initSets(); renderMain(); }
+  if (id === 'pgManage') renderManage();
+}
+
+function openHistory() {
+  goPage('pgHistory');
+  renderHistory();
+}
+
+// ── Progressive toggle ──
+function toggleProg() {
+  isProg = !isProg;
+  var b = document.getElementById('btnProg');
+  if (isProg) b.classList.add('on'); else b.classList.remove('on');
+  renderMain();
+}
+
+// ── Confirm a set ──
+function confirmSet(idx) {
+  var ex  = exList[idx];
+  var inp = document.getElementById('i' + idx);
+  var val = inp.value.trim();
+  if (val === '') {
+    var ph = inp.placeholder;
+    if (ph && ph !== '--') val = ph;
+  }
+  if (val === '' || val === '--') return;
+
+  var s = sets[ex] || [];
+  if (s.length >= MAX_SETS) return;
+  s.push(val);
+  sets[ex] = s;
+  inp.value = '';
+
+  // badge
+  var badge = document.getElementById('bd' + idx);
+  badge.textContent = s.length;
+  badge.style.display = 'inline-flex';
+
+  // placeholder for next set
+  if (isProg) inp.placeholder = val;
+
+  // dots
+  renderDots(idx);
+}
+
+function renderDots(idx) {
+  var ex = exList[idx];
+  var s  = sets[ex] || [];
+  var c  = document.getElementById('dt' + idx);
+  if (!c) return;
+  var h = '';
+  for (var i = 0; i < MAX_SETS; i++) {
+    if (i < s.length) {
+      h += '<div class="dot ' + (isProg ? 'o' : 'g') + '">' + s[i] + '</div>';
+    } else {
+      h += '<div class="dot">' + (i + 1) + '</div>';
     }
-    function loadHistory() {
-        try { var s = localStorage.getItem('workoutHistory'); if (s) return JSON.parse(s); } catch(e) {}
-        return [];
+  }
+  c.innerHTML = h;
+}
+
+// ── Render main ──
+function renderMain() {
+  initSets();
+  var c = document.getElementById('exList');
+  if (!c) return;
+  var html = '';
+  for (var i = 0; i < exList.length; i++) {
+    var ex   = exList[i];
+    var lw   = lastW[ex] || '--';
+    var ph   = lw;
+    if (isProg) {
+      var n = parseFloat(lw);
+      if (!isNaN(n) && n > 0) ph = String(n + 2.5);
     }
-    function loadLastWeights() {
-        try { var s = localStorage.getItem('lastWeights'); if (s) return JSON.parse(s); } catch(e) {}
-        return {};
-    }
+    var s     = sets[ex] || [];
+    var cnt   = s.length;
+    var nCls  = isProg ? 'ex-name prog' : 'ex-name';
+    var bdSt  = cnt > 0 ? 'display:inline-flex' : 'display:none';
 
-    var exercises    = loadExercises();
-    var workoutLog      = loadHistory();
-    var lastWeights  = loadLastWeights();
-    var isProgressive = false;
-    var currentSets  = {};   // { exName: [{weight}] }
-    var renamingIdx  = null;
-
-    function initSets() {
-        exercises.forEach(function(ex) {
-            if (!currentSets[ex]) currentSets[ex] = [];
-        });
-    }
-
-    // ── Toggle Progressive ──
-    function toggleProg() {
-        isProgressive = !isProgressive;
-        var btn = document.getElementById('progBtn');
-        if (isProgressive) btn.classList.add('active'); else btn.classList.remove('active');
-        renderExercises();
-    }
-
-    // ── Confirm Set ──
-    function confirmSet(idx) {
-        var ex = exercises[idx];
-        var inp = document.getElementById('inp-' + idx);
-        var val = inp.value.trim();
-        if (val === '' && inp.placeholder && inp.placeholder !== '--') val = inp.placeholder;
-        if (val === '' || val === '--') return;
-        var sets = currentSets[ex] || [];
-        if (sets.length >= MAX_SETS) return;
-        sets.push({ weight: val });
-        currentSets[ex] = sets;
-        inp.value = '';
-
-        // Update badge
-        var badge = document.getElementById('badge-' + idx);
-        badge.textContent = sets.length;
-        if (sets.length > 0) badge.classList.remove('hide'); else badge.classList.add('hide');
-
-        // Update dots
-        renderDots(idx);
-
-        // Update placeholder
-        if (isProgressive && sets.length > 0) {
-            inp.placeholder = sets[sets.length - 1].weight;
-        }
-    }
-
-    function renderDots(idx) {
-        var ex = exercises[idx];
-        var sets = currentSets[ex] || [];
-        var cont = document.getElementById('dots-' + idx);
-        if (!cont) return;
-        var html = '';
-        for (var s = 0; s < MAX_SETS; s++) {
-            if (s < sets.length) {
-                var cls = isProgressive ? 'dot prog-done' : 'dot done';
-                html += '<div class="' + cls + '">' + sets[s].weight + '</div>';
-            } else {
-                html += '<div class="dot">' + (s + 1) + '</div>';
-            }
-        }
-        cont.innerHTML = html;
-    }
-
-    // ── Render all exercise cards ──
-    function renderExercises() {
-        initSets();
-        var list = document.getElementById('ex-list');
-        if (!list) return;
-        list.innerHTML = '';
-
-        exercises.forEach(function(ex, idx) {
-            var lw = lastWeights[ex] || '--';
-            var ph;
-            if (isProgressive) {
-                var lwf = parseFloat(lw);
-                ph = (!isNaN(lwf) && lwf > 0) ? String(lwf + 2.5) : lw;
-            } else {
-                ph = lw;
-            }
-
-            var sets = currentSets[ex] || [];
-            var count = sets.length;
-
-            var nameClass = 'ex-name' + (isProgressive ? ' prog' : '');
-            var badgeHide = count === 0 ? ' hide' : '';
-
-            var dotsHTML = '';
-            for (var s = 0; s < MAX_SETS; s++) {
-                if (s < count) {
-                    var dc = isProgressive ? 'dot prog-done' : 'dot done';
-                    dotsHTML += '<div class="' + dc + '">' + sets[s].weight + '</div>';
-                } else {
-                    dotsHTML += '<div class="dot">' + (s + 1) + '</div>';
-                }
-            }
-
-            var card = document.createElement('div');
-            card.className = 'ex-card';
-            card.innerHTML =
-                '<div class="card-top">' +
-                    '<div class="ex-info">' +
-                        '<div class="name-row">' +
-                            '<span class="' + nameClass + '" title="' + ex + '">' + ex + '</span>' +
-                            '<span id="badge-' + idx + '" class="badge' + badgeHide + '">' + (count || 0) + '</span>' +
-                        '</div>' +
-                        '<div class="last-w">Zuletzt: ' + lw + ' kg</div>' +
-                    '</div>' +
-                    '<div class="input-row">' +
-                        '<input type="number" id="inp-' + idx + '" data-ex="' + ex + '" ' +
-                               'value="" placeholder="' + ph + '" step="0.5" inputmode="decimal">' +
-                        '<button class="check-btn" onclick="confirmSet(' + idx + ')">✔</button>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="dots-row" id="dots-' + idx + '">' + dotsHTML + '</div>';
-
-            list.appendChild(card);
-        });
+    var dots = '';
+    for (var d = 0; d < MAX_SETS; d++) {
+      if (d < cnt) {
+        dots += '<div class="dot ' + (isProg ? 'o' : 'g') + '">' + s[d] + '</div>';
+      } else {
+        dots += '<div class="dot">' + (d + 1) + '</div>';
+      }
     }
 
-    // ── Save ──
-    function saveWorkout() {
-        // Grab any un-confirmed input
-        exercises.forEach(function(ex, idx) {
-            var inp = document.getElementById('inp-' + idx);
-            if (!inp) return;
-            var val = inp.value.trim();
-            if (val !== '') {
-                var sets = currentSets[ex] || [];
-                if (sets.length < MAX_SETS) { sets.push({ weight: val }); currentSets[ex] = sets; }
-                inp.value = '';
-            }
-        });
+    html +=
+      '<div class="card">' +
+        '<div class="card-top">' +
+          '<div>' +
+            '<div style="display:flex;align-items:center;">' +
+              '<span class="' + nCls + '">' + ex + '</span>' +
+              '<span id="bd' + i + '" class="badge" style="' + bdSt + '">' + cnt + '</span>' +
+            '</div>' +
+            '<div class="sub">Zuletzt: ' + lw + ' kg</div>' +
+          '</div>' +
+          '<div class="inp-row">' +
+            '<input type="number" id="i' + i + '" placeholder="' + ph + '" step="0.5" inputmode="decimal">' +
+            '<button class="b-check" onclick="confirmSet(' + i + ')">✔</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="dots" id="dt' + i + '">' + dots + '</div>' +
+      '</div>';
+  }
+  c.innerHTML = html;
+}
 
-        var hasEntry = exercises.some(function(ex) { return (currentSets[ex] || []).length > 0; });
-        if (!hasEntry) return;
-
-        var date = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-        var session = { date: date, weights: {} };
-
-        exercises.forEach(function(ex) {
-            var sets = currentSets[ex] || [];
-            if (sets.length > 0) {
-                session.weights[ex] = sets.map(function(s) { return s.weight; });
-                lastWeights[ex] = sets[sets.length - 1].weight;
-            } else {
-                session.weights[ex] = null;
-            }
-        });
-
-        workoutLog.unshift(session);
-        try { localStorage.setItem('workoutHistory', JSON.stringify(workoutLog)); } catch(e) {}
-        try { localStorage.setItem('lastWeights', JSON.stringify(lastWeights)); } catch(e) {}
-
-        currentSets = {};
-        initSets();
-
-        var btn = document.getElementById('saveBtn');
-        btn.classList.add('ok');
-        btn.textContent = 'Gespeichert! ✓';
-        setTimeout(function() {
-            btn.classList.remove('ok');
-            btn.textContent = 'Training speichern';
-            renderExercises();
-        }, 1000);
+// ── Save workout ──
+function saveWorkout() {
+  // grab leftover inputs
+  for (var i = 0; i < exList.length; i++) {
+    var ex  = exList[i];
+    var inp = document.getElementById('i' + i);
+    if (inp && inp.value.trim() !== '') {
+      var s = sets[ex] || [];
+      if (s.length < MAX_SETS) { s.push(inp.value.trim()); sets[ex] = s; }
     }
+  }
 
-    // ── Views ──
-    function show(id) {
-        ['view-main','view-manage','view-history'].forEach(function(v) {
-            document.getElementById(v).style.display = 'none';
-        });
-        document.getElementById(id).style.display = 'block';
-    }
+  var hasEntry = false;
+  for (var i = 0; i < exList.length; i++) {
+    if ((sets[exList[i]] || []).length > 0) { hasEntry = true; break; }
+  }
+  if (!hasEntry) return;
 
-    function goMain() {
-        show('view-main');
-        initSets();
-        renderExercises();
-    }
+  var d   = new Date();
+  var dt  = ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2);
+  var session = { date: dt, w: {} };
 
-    function goManage() {
-        show('view-manage');
-        renderManage();
+  for (var i = 0; i < exList.length; i++) {
+    var ex = exList[i];
+    var s  = sets[ex] || [];
+    if (s.length > 0) {
+      session.w[ex] = s.slice();
+      lastW[ex] = s[s.length - 1];
     }
+  }
 
-    function goHistory() {
-        show('view-history');
-        renderHistory();
-    }
+  wLog.unshift(session);
+  lsSet('wLog', wLog);
+  lsSet('lastW', lastW);
 
-    // ── Manage ──
-    function renderManage() {
-        var c = document.getElementById('manage-list');
-        c.innerHTML = '';
-        exercises.forEach(function(ex, idx) {
-            var item = document.createElement('div');
-            item.className = 'manage-item';
-            item.innerHTML =
-                '<span>' + ex + '</span>' +
-                '<button class="btn-edit" onclick="openModal(' + idx + ')">✏️ Umbenennen</button>' +
-                '<button class="btn-del" onclick="delEx(' + idx + ')">🗑</button>';
-            c.appendChild(item);
-        });
-    }
+  sets = {};
+  initSets();
 
-    function addEx() {
-        var inp = document.getElementById('newExName');
-        var name = inp.value.trim();
-        if (!name) return;
-        if (exercises.indexOf(name) !== -1) { alert('Übung existiert bereits'); return; }
-        exercises.push(name);
-        saveExList();
-        inp.value = '';
-        renderManage();
-    }
+  var btn = document.getElementById('btnSave');
+  btn.classList.add('ok');
+  btn.textContent = 'Gespeichert! ✓';
+  setTimeout(function() {
+    btn.classList.remove('ok');
+    btn.textContent = 'Training speichern';
+    renderMain();
+  }, 1000);
+}
 
-    function delEx(idx) {
-        if (exercises.length <= 1) return;
-        if (!confirm('"' + exercises[idx] + '" löschen?')) return;
-        exercises.splice(idx, 1);
-        saveExList();
-        renderManage();
-    }
+// ── Manage exercises ──
+function renderManage() {
+  var c = document.getElementById('mList');
+  if (!c) return;
+  var html = '';
+  for (var i = 0; i < exList.length; i++) {
+    html +=
+      '<div class="m-item">' +
+        '<span>' + exList[i] + '</span>' +
+        '<button class="b-edit" onclick="openModal(' + i + ')">✏️ Umbenennen</button>' +
+        '<button class="b-del" onclick="delEx(' + i + ')">🗑</button>' +
+      '</div>';
+  }
+  c.innerHTML = html;
+}
 
-    function saveExList() {
-        try { localStorage.setItem('exerciseOrder', JSON.stringify(exercises)); } catch(e) {}
-    }
+function addEx() {
+  var inp  = document.getElementById('newName');
+  var name = inp.value.trim();
+  if (!name) return;
+  for (var i = 0; i < exList.length; i++) {
+    if (exList[i] === name) { alert('Existiert bereits'); return; }
+  }
+  exList.push(name);
+  lsSet('exList', exList);
+  inp.value = '';
+  renderManage();
+}
 
-    // ── Rename Modal ──
-    function openModal(idx) {
-        renamingIdx = idx;
-        document.getElementById('renameVal').value = exercises[idx];
-        document.getElementById('modal').classList.add('open');
-    }
-    function closeModal() {
-        renamingIdx = null;
-        document.getElementById('modal').classList.remove('open');
-    }
-    function doRename() {
-        var newName = document.getElementById('renameVal').value.trim();
-        if (!newName || renamingIdx === null) return;
-        var old = exercises[renamingIdx];
-        if (lastWeights[old] !== undefined) {
-            lastWeights[newName] = lastWeights[old];
-            delete lastWeights[old];
-            try { localStorage.setItem('lastWeights', JSON.stringify(lastWeights)); } catch(e) {}
-        }
-        exercises[renamingIdx] = newName;
-        saveExList();
-        closeModal();
-        renderManage();
-    }
+function delEx(idx) {
+  if (exList.length <= 1) return;
+  if (!confirm('"' + exList[idx] + '" löschen?')) return;
+  exList.splice(idx, 1);
+  lsSet('exList', exList);
+  renderManage();
+}
 
-    // ── History ──
-    function renderHistory() {
-        var head = document.getElementById('h-head');
-        head.innerHTML = '<th>Datu
+// ── Modal ──
+function openModal(idx) {
+  reIdx = idx;
+  document.getElementById('renameInp').value = exList[idx];
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() {
+  reIdx = null;
+  document.getElementById('modal').classList.remove('show');
+}
+function doRename() {
+  var n = document.getElementById('renameInp').value.trim();
+  if (!n || reIdx === null) return;
+  var old = exList[reIdx];
+  if (lastW[old] !== undefined) { lastW[n] = lastW[old]; delete lastW[old]; lsSet('lastW', lastW); }
+  exList[reIdx] = n;
+  lsSet('exList', exList);
+  closeModal();
+  renderManage();
+}
+
+// ── History ──
+function renderHistory() {
+  var head = document.getElementById('hHead');
+  var body = document.getElementById('hBody');
+  if (!head || !body) return;
+
+  var hh = '<th>Datum</th>';
+  for (var i = 0; i < exList.length; i++) hh += '<th>' + exList[i].substring(0, 5) + '.</th>';
+  head.innerHTML = hh;
+
+  var hb = '';
+  for (var r = 0; r < wLog.length; r++) {
+    var s = wLog[r];
+    hb += '<tr><td class="dc">' + s.date + '</td>';
+    for (var i = 0; i < exList.length; i++) {
+      var val = s.w ? s.w[exList[i]] : null;
+      if (!val || val.length === 0) {
+        hb += '<td>-</td>';
+      } else if (typeof val === 'string') {
+        hb += '<td>' + val + '</td>';
+      } else {
+        hb += '<td class="ml">' + val.join('<br>') + '</td>';
+      }
+    }
+    hb += '</tr>';
+  }
+  body.innerHTML = hb;
+}
+
+function clearLog() {
+  if (!confirm('Verlauf löschen?')) return;
+  wLog = [];
+  lsSet('wLog', wLog);
+  renderHistory();
+}
+
+// ── START ──
+initSets();
+renderMain();
+</script>
+</body>
+</html>
