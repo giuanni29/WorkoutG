@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Workout Tracker Pro Silent</title>
+    <title>Workout Tracker Pro</title>
     <style>
         :root {
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --text-main: #ffffff;
-            --accent: #00adb5; 
-            --prog-accent: #ff9800; 
+            --accent: #00adb5;
+            --prog-accent: #ff9800;
             --check-green: #4caf50;
+            --set-dot: #00adb5;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: sans-serif;
@@ -23,60 +26,131 @@
             overflow-x: hidden;
         }
 
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
             gap: 10px;
         }
-        
-        .header-left { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             flex: 1;
         }
 
         h2 { color: var(--accent); margin: 0; font-size: 1.2em; white-space: nowrap; }
 
-        .nav-btn { 
-            background: #2a2a2a; 
-            border: 1px solid var(--accent); 
-            color: var(--accent); 
-            padding: 6px 8px; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            cursor: pointer; 
+        .nav-btn {
+            background: #2a2a2a;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
             font-size: 0.75em;
         }
-        
-        .prog-btn { 
-            background: #2a2a2a; 
-            border: 1px solid var(--prog-accent); 
-            color: var(--prog-accent); 
-            padding: 6px 8px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
+
+        .prog-btn {
+            background: #2a2a2a;
+            border: 1px solid var(--prog-accent);
+            color: var(--prog-accent);
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
             font-size: 0.7em;
         }
         .prog-btn.active { background: var(--prog-accent); color: #000; }
 
+        /* ── Exercise Card ── */
         .exercise-card {
             background: var(--card-bg);
             padding: 12px;
             border-radius: 12px;
-            display: flex;
-            justify-content: space-between; 
-            align-items: center;
             margin-bottom: 12px;
         }
 
-        .exercise-info { display: flex; flex-direction: column; }
-        .exercise-name { font-weight: bold; font-size: 1.05em; transition: color 0.3s ease; }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+
+        .name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .exercise-name {
+            font-weight: bold;
+            font-size: 1.05em;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+            cursor: pointer;
+        }
+        .exercise-name:hover { text-decoration: underline; }
         .prog-mode-text { color: var(--prog-accent) !important; }
+
+        /* Set counter badge */
+        .set-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 0.7em;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .set-badge.hidden { display: none; }
+
         .last-weight { font-size: 0.8em; color: #888; margin-top: 2px; }
+
+        /* Set dots row */
+        .sets-dots {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .set-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            color: #888;
+            font-weight: bold;
+        }
+        .set-dot.done {
+            background: var(--check-green);
+            border-color: var(--check-green);
+            color: #000;
+        }
+        .set-dot.prog-done {
+            background: var(--prog-accent);
+            border-color: var(--prog-accent);
+            color: #000;
+        }
 
         .input-group {
             display: flex;
@@ -88,7 +162,7 @@
             width: 75px;
             background: #2a2a2a;
             border: 1px solid #444;
-            color: var(--accent); 
+            color: var(--accent);
             padding: 10px 5px;
             border-radius: 8px;
             text-align: center;
@@ -97,7 +171,7 @@
             outline: none;
             transition: all 0.2s ease;
         }
-        
+
         input.is-confirmed {
             background-color: var(--prog-accent) !important;
             color: #000 !important;
@@ -117,178 +191,431 @@
 
         .save-btn {
             background: var(--accent);
-            color: white; border: none; padding: 18px; border-radius: 12px;
-            width: 100%; font-weight: bold; font-size: 1.1em; margin-top: 10px;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 10px;
             transition: all 0.3s ease;
             cursor: pointer;
         }
+        .save-btn.success { background-color: var(--check-green); }
 
-        .save-btn.success {
-            background-color: var(--check-green);
+        /* ── Edit Exercise Modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: #1e1e1e;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 340px;
+            border: 1px solid #333;
+        }
+        .modal h3 { margin: 0 0 16px; color: var(--accent); font-size: 1em; }
+
+        .modal input[type="text"] {
+            width: 100%;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            margin-bottom: 12px;
         }
 
+        .modal-row { display: flex; gap: 10px; }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9em;
+            border: none;
+        }
+        .modal-confirm { background: var(--accent); color: #000; }
+        .modal-cancel { background: #333; color: #aaa; }
+
+        /* ── Manage Exercises View ── */
+        #manage-view { display: none; }
+
+        .manage-item {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .manage-item span {
+            flex: 1;
+            font-size: 1em;
+        }
+        .manage-edit-btn {
+            background: #2a2a2a;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            cursor: pointer;
+        }
+        .manage-del-btn {
+            background: #2a2a2a;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            cursor: pointer;
+        }
+        .add-ex-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .add-ex-row input[type="text"] {
+            flex: 1;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            outline: none;
+        }
+        .add-ex-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        /* ── History View ── */
         #history-view { display: none; }
         .table-wrapper { width: 100%; overflow-x: auto; background: var(--card-bg); border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; min-width: 450px; }
         th, td { padding: 12px 8px; border-bottom: 1px solid #333; text-align: center; font-size: 0.85em; }
         th { color: var(--accent); background: #252525; }
         .date-col { font-weight: bold; text-align: left; padding-left: 12px; background: #252525; }
+        td.multi { font-size: 0.75em; line-height: 1.6; }
 
-        .reset-btn { margin-top: 40px; color: #ff4444; background: none; border: 1px solid #ff4444; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; }
+        .reset-btn {
+            margin-top: 40px;
+            color: #ff4444;
+            background: none;
+            border: 1px solid #ff4444;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div id="main-view">
-        <div class="header">
-            <div class="header-left">
-                <h2>Workout</h2>
-                <button id="progToggle" class="prog-btn" onclick="toggleProgressive()">Progressiv +2.5</button>
-            </div>
-            <button class="nav-btn" onclick="showHistory()">📅 Übersicht</button>
+<!-- ── MAIN VIEW ── -->
+<div id="main-view">
+    <div class="header">
+        <div class="header-left">
+            <h2>Workout</h2>
+            <button id="progToggle" class="prog-btn" onclick="toggleProgressive()">Progressiv +2.5</button>
         </div>
-        <div id="exercise-list"></div>
-        <button id="saveBtn" class="save-btn" onclick="saveWorkout()">Training speichern</button>
+        <div style="display:flex;gap:6px;">
+            <button class="nav-btn" onclick="showManage()">✏️ Übungen</button>
+            <button class="nav-btn" onclick="showHistory()">📅 Verlauf</button>
+        </div>
     </div>
+    <div id="exercise-list"></div>
+    <button id="saveBtn" class="save-btn" onclick="saveWorkout()">Training speichern</button>
+</div>
 
-    <div id="history-view">
-        <div class="header">
-            <h2>Verlauf</h2>
-            <button class="nav-btn" onclick="showMain()">Zurück</button>
-        </div>
-        <div class="table-wrapper">
-            <table>
-                <thead><tr id="h-head"></tr></thead>
-                <tbody id="h-body"></tbody>
-            </table>
-        </div>
-        <button id="clearBtn" class="reset-btn" onclick="clearData()">Verlauf leeren</button>
+<!-- ── MANAGE EXERCISES VIEW ── -->
+<div id="manage-view">
+    <div class="header">
+        <h2>Übungen verwalten</h2>
+        <button class="nav-btn" onclick="showMain()">Zurück</button>
     </div>
+    <div id="manage-list"></div>
+    <div class="add-ex-row">
+        <input type="text" id="newExInput" placeholder="Neue Übung..." maxlength="30">
+        <button class="add-ex-btn" onclick="addExercise()">+ Hinzufügen</button>
+    </div>
+</div>
 
-    <script>
-        let exercises = ['Bankdrücken', 'Curls', 'Trizeps', 'Rudern', 'Butterfly revers', 'Butterfly'];
-        let isProgressive = false;
-        
-        if(localStorage.getItem('exerciseOrder')) exercises = JSON.parse(localStorage.getItem('exerciseOrder'));
-        let workoutHistory = JSON.parse(localStorage.getItem('workoutHistory')) || [];
-        let lastWeights = JSON.parse(localStorage.getItem('lastWeights')) || {};
+<!-- ── HISTORY VIEW ── -->
+<div id="history-view">
+    <div class="header">
+        <h2>Verlauf</h2>
+        <button class="nav-btn" onclick="showMain()">Zurück</button>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <thead><tr id="h-head"></tr></thead>
+            <tbody id="h-body"></tbody>
+        </table>
+    </div>
+    <button class="reset-btn" onclick="clearData()">Verlauf leeren</button>
+</div>
 
-        function toggleProgressive() {
-            isProgressive = !isProgressive;
-            document.getElementById('progToggle').classList.toggle('active');
-            renderExercises();
+<!-- ── RENAME MODAL ── -->
+<div id="renameModal" class="modal-overlay">
+    <div class="modal">
+        <h3>Übung umbenennen</h3>
+        <input type="text" id="renameInput" maxlength="30" placeholder="Neuer Name...">
+        <div class="modal-row">
+            <button class="modal-btn modal-cancel" onclick="closeRenameModal()">Abbrechen</button>
+            <button class="modal-btn modal-confirm" onclick="confirmRename()">Speichern</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const DEFAULT_EXERCISES = ['Bankdrücken', 'Curls', 'Trizeps', 'Rudern', 'Butterfly revers', 'Butterfly'];
+    const MAX_SETS = 9;
+
+    let exercises = JSON.parse(localStorage.getItem('exerciseOrder')) || [...DEFAULT_EXERCISES];
+    let isProgressive = false;
+    let workoutHistory = JSON.parse(localStorage.getItem('workoutHistory')) || [];
+    let lastWeights = JSON.parse(localStorage.getItem('lastWeights')) || {};
+
+    // Per-exercise set state: { exerciseName: [ {weight, confirmed}, ... ] }
+    let currentSets = {};
+
+    let renamingIdx = null;
+
+    /* ─── Init ─── */
+    function initCurrentSets() {
+        exercises.forEach(ex => {
+            if (!currentSets[ex]) currentSets[ex] = [];
+        });
+    }
+
+    /* ─── Progressive toggle ─── */
+    function toggleProgressive() {
+        isProgressive = !isProgressive;
+        document.getElementById('progToggle').classList.toggle('active');
+        renderExercises();
+    }
+
+    /* ─── Confirm a set for exercise idx ─── */
+    function confirmSet(idx) {
+        const ex = exercises[idx];
+        const input = document.getElementById(`input-${idx}`);
+        let val = input.value.trim();
+
+        // If empty, use placeholder
+        if (val === '' && input.placeholder && input.placeholder !== '--') {
+            val = input.placeholder;
+        }
+        if (val === '' || val === '--') return;
+
+        const sets = currentSets[ex] || [];
+        if (sets.length >= MAX_SETS) return; // max 9 sets
+
+        sets.push({ weight: val });
+        currentSets[ex] = sets;
+
+        // Clear input for next set
+        input.value = '';
+        input.classList.remove('is-confirmed');
+
+        // Update the card without full re-render
+        updateCardUI(idx);
+    }
+
+    /* ─── Update single card UI after confirming a set ─── */
+    function updateCardUI(idx) {
+        const ex = exercises[idx];
+        const sets = currentSets[ex] || [];
+        const count = sets.length;
+
+        // Badge
+        const badge = document.getElementById(`badge-${idx}`);
+        if (badge) {
+            if (count === 0) {
+                badge.classList.add('hidden');
+            } else {
+                badge.classList.remove('hidden');
+                badge.textContent = count;
+            }
         }
 
-        function confirmEntry(idx) {
-            const input = document.getElementById(`input-${idx}`);
-            if (input.value.trim() === "" && input.placeholder && input.placeholder !== '--') {
-                input.value = input.placeholder;
+        // Dots
+        const dotsContainer = document.getElementById(`dots-${idx}`);
+        if (dotsContainer) {
+            dotsContainer.innerHTML = '';
+            for (let s = 0; s < count; s++) {
+                const dot = document.createElement('div');
+                dot.className = isProgressive ? 'set-dot prog-done' : 'set-dot done';
+                dot.textContent = sets[s].weight;
+                dotsContainer.appendChild(dot);
             }
-            if (input.value.trim() !== "") {
-                if (isProgressive) input.classList.add('is-confirmed');
+            // Empty slots up to 9
+            for (let s = count; s < MAX_SETS; s++) {
+                const dot = document.createElement('div');
+                dot.className = 'set-dot';
+                dot.textContent = s + 1;
+                dotsContainer.appendChild(dot);
             }
         }
 
-        function renderExercises() {
-            const list = document.getElementById('exercise-list');
-            list.innerHTML = '';
-            exercises.forEach((ex, idx) => {
+        // Update placeholder for next set
+        const input = document.getElementById(`input-${idx}`);
+        if (input) {
+            if (count > 0 && isProgressive) {
+                // carry forward last confirmed weight
+                input.placeholder = sets[count - 1].weight;
+            } else {
                 const lw = parseFloat(lastWeights[ex]) || 0;
-                const displayLw = lastWeights[ex] || '--';
-                const placeholderValue = (isProgressive && lw > 0) ? (lw + 2.5) : displayLw;
+                input.placeholder = (isProgressive && lw > 0) ? String(lw + 2.5) : (lastWeights[ex] || '--');
+            }
+        }
+    }
 
-                const card = document.createElement('div');
-                card.className = 'exercise-card';
-                const nameClass = isProgressive ? 'exercise-name prog-mode-text' : 'exercise-name';
+    /* ─── Render all exercises ─── */
+    function renderExercises() {
+        initCurrentSets();
+        const list = document.getElementById('exercise-list');
+        list.innerHTML = '';
 
-                card.innerHTML = `
+        exercises.forEach((ex, idx) => {
+            const lw = parseFloat(lastWeights[ex]) || 0;
+            const displayLw = lastWeights[ex] || '--';
+            const placeholderValue = (isProgressive && lw > 0) ? (lw + 2.5) : displayLw;
+
+            const sets = currentSets[ex] || [];
+            const count = sets.length;
+
+            const card = document.createElement('div');
+            card.className = 'exercise-card';
+            const nameClass = isProgressive ? 'exercise-name prog-mode-text' : 'exercise-name';
+
+            // Build dots HTML
+            let dotsHTML = '';
+            for (let s = 0; s < MAX_SETS; s++) {
+                if (s < count) {
+                    const dotClass = isProgressive ? 'set-dot prog-done' : 'set-dot done';
+                    dotsHTML += `<div class="${dotClass}">${sets[s].weight}</div>`;
+                } else {
+                    dotsHTML += `<div class="set-dot">${s + 1}</div>`;
+                }
+            }
+
+            card.innerHTML = `
+                <div class="card-top">
                     <div class="exercise-info">
-                        <span class="${nameClass}">${ex}</span>
+                        <div class="name-row">
+                            <span class="${nameClass}" title="${ex}">${ex}</span>
+                            <span id="badge-${idx}" class="set-badge${count === 0 ? ' hidden' : ''}">${count}</span>
+                        </div>
                         <span class="last-weight">Zuletzt: ${displayLw} kg</span>
                     </div>
                     <div class="input-group">
-                        <input type="number" id="input-${idx}" class="w-input" 
+                        <input type="number" id="input-${idx}" class="w-input"
                                oninput="this.classList.remove('is-confirmed')"
-                               data-name="${ex}" value="" placeholder="${placeholderValue}" 
+                               data-name="${ex}" value=""
+                               placeholder="${placeholderValue}"
                                step="0.5" inputmode="decimal">
-                        <button class="check-btn" onclick="confirmEntry(${idx})">✔</button>
+                        <button class="check-btn" onclick="confirmSet(${idx})">✔</button>
                     </div>
-                `;
-                list.appendChild(card);
-            });
-        }
+                </div>
+                <div class="sets-dots" id="dots-${idx}">${dotsHTML}</div>
+            `;
+            list.appendChild(card);
+        });
+    }
 
-        function saveWorkout() {
-            const btn = document.getElementById('saveBtn');
-            const date = new Date().toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'});
-            const inputs = document.querySelectorAll('.w-input');
-            let session = { date: date, weights: {} };
-            let hasEntry = false;
+    /* ─── Save workout ─── */
+    function saveWorkout() {
+        const btn = document.getElementById('saveBtn');
+        const date = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
 
-            inputs.forEach(i => {
-                const name = i.getAttribute('data-name');
-                const val = i.value.trim();
-                if(val !== "") {
-                    session.weights[name] = val;
-                    lastWeights[name] = val;
-                    hasEntry = true;
-                } else {
-                    session.weights[name] = "-";
+        // Also pick up any unconfirmed input values
+        exercises.forEach((ex, idx) => {
+            const input = document.getElementById(`input-${idx}`);
+            if (input) {
+                const val = input.value.trim();
+                if (val !== '') {
+                    const sets = currentSets[ex] || [];
+                    if (sets.length < MAX_SETS) {
+                        sets.push({ weight: val });
+                        currentSets[ex] = sets;
+                    }
                 }
-                i.value = '';
-                i.classList.remove('is-confirmed');
-            });
-
-            if(!hasEntry) return;
-
-            workoutHistory.unshift(session);
-            localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory));
-            localStorage.setItem('lastWeights', JSON.stringify(lastWeights));
-            
-            // Visuelles Feedback statt Alert
-            btn.classList.add('success');
-            btn.innerText = "Gespeichert! ✓";
-            
-            setTimeout(() => {
-                btn.classList.remove('success');
-                btn.innerText = "Training speichern";
-                renderExercises();
-            }, 1000);
-        }
-
-        function showHistory() {
-            document.getElementById('main-view').style.display = 'none';
-            document.getElementById('history-view').style.display = 'block';
-            const head = document.getElementById('h-head');
-            head.innerHTML = '<th>Datum</th>' + exercises.map(ex => `<th>${ex.substring(0,4)}.</th>`).join('');
-            const body = document.getElementById('h-body');
-            body.innerHTML = '';
-            workoutHistory.forEach(s => {
-                let row = `<tr><td class="date-col">${s.date}</td>`;
-                exercises.forEach(ex => {
-                    let val = (s.weights && s.weights[ex]) ? s.weights[ex] : '-';
-                    row += `<td>${val}</td>`;
-                });
-                row += '</tr>';
-                body.innerHTML += row;
-            });
-        }
-
-        function showMain() {
-            document.getElementById('history-view').style.display = 'none';
-            document.getElementById('main-view').style.display = 'block';
-            renderExercises();
-        }
-
-        function clearData() {
-            if(confirm("Verlauf löschen?")) {
-                workoutHistory = [];
-                localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory));
-                showHistory();
             }
-        }
+        });
 
-        renderExercises();
-    </script>
-</body>
-</html>
+        // Check if anything was entered
+        let hasEntry = exercises.some(ex => (currentSets[ex] || []).length > 0);
+        if (!hasEntry) return;
+
+        const session = { date, weights: {} };
+
+        exercises.forEach(ex => {
+            const sets = currentSets[ex] || [];
+            if (sets.length > 0) {
+                // Store all set weights as array
+                session.weights[ex] = sets.map(s => s.weight);
+                // last weight = last set for next session default
+                lastWeights[ex] = sets[sets.length - 1].weight;
+            } else {
+                session.weights[ex] = null;
+            }
+        });
+
+        workoutHistory.unshift(session);
+        localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory));
+        localStorage.setItem('lastWeights', JSON.stringify(lastWeights));
+
+        // Reset current sets
+        currentSets = {};
+        initCurrentSets();
+
+        btn.classList.add('success');
+        btn.innerText = 'Gespeichert! ✓';
+        setTimeout(() => {
+            btn.classList.remove('success');
+            btn.innerText = 'Training speichern';
+            renderExercises();
+        }, 1000);
+    }
+
+    /* ─── History ─── */
+    function showHistory() {
+        document.getElementById('main-view').style.display = 'none';
+        document.getElementById('history-view').style.display = 'block';
+
+        const head = document.getElementById('h-head');
+        head.innerHTML = '<th>Datum</th>' + exercises.map(ex => `<th>${ex.substring(0, 5)}.</th>`).join('');
+
+        const body = document.getElementById('h-body');
+        body.innerHTML = '';
+
+        workoutHistory.forEach(s => {
+            let row = `<tr><td class="date-col">${s.date}</td>`;
+            exercises.forEach(ex => {
+                const val = s.weights && s.weights[ex];
+           
