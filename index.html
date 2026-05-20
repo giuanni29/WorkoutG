@@ -6,302 +6,196 @@
     <title>Workout Tracker Pro</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-main: #ffffff;
+            --bg: #121212;
+            --card: #1e1e1e;
             --accent: #00adb5;
-            --prog-accent: #ff9800;
-            --check-green: #4caf50;
-            --set-dot: #00adb5;
+            --orange: #ff9800;
+            --green: #4caf50;
+            --red: #ff4444;
         }
-
-        * { box-sizing: border-box; }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
+            background: var(--bg);
+            color: #fff;
             padding: 15px;
             overflow-x: hidden;
         }
-
+        /* HEADER */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            gap: 10px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
             gap: 8px;
-            flex: 1;
         }
-
-        h2 { color: var(--accent); margin: 0; font-size: 1.2em; white-space: nowrap; }
-
-        .nav-btn {
+        .header h2 { color: var(--accent); font-size: 1.2em; white-space: nowrap; }
+        .hbtns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+        .btn-outline {
             background: #2a2a2a;
             border: 1px solid var(--accent);
             color: var(--accent);
-            padding: 6px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.75em;
-        }
-
-        .prog-btn {
-            background: #2a2a2a;
-            border: 1px solid var(--prog-accent);
-            color: var(--prog-accent);
-            padding: 6px 8px;
+            padding: 7px 10px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.7em;
+            font-size: 0.75em;
+            white-space: nowrap;
         }
-        .prog-btn.active { background: var(--prog-accent); color: #000; }
+        .btn-prog {
+            background: #2a2a2a;
+            border: 1px solid var(--orange);
+            color: var(--orange);
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.75em;
+            white-space: nowrap;
+        }
+        .btn-prog.active { background: var(--orange); color: #000; }
 
-        /* ── Exercise Card ── */
-        .exercise-card {
-            background: var(--card-bg);
-            padding: 12px;
+        /* EXERCISE CARD */
+        .ex-card {
+            background: var(--card);
             border-radius: 12px;
+            padding: 12px;
             margin-bottom: 12px;
         }
-
         .card-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
         }
-
-        .exercise-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-
-        .name-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .exercise-name {
+        .ex-info { flex: 1; min-width: 0; }
+        .name-row { display: flex; align-items: center; gap: 6px; }
+        .ex-name {
             font-weight: bold;
-            font-size: 1.05em;
-            transition: color 0.3s ease;
+            font-size: 1em;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 140px;
-            cursor: pointer;
+            max-width: 130px;
         }
-        .exercise-name:hover { text-decoration: underline; }
-        .prog-mode-text { color: var(--prog-accent) !important; }
-
-        /* Set counter badge */
-        .set-badge {
+        .ex-name.prog { color: var(--orange); }
+        .badge {
             background: var(--accent);
             color: #000;
-            font-size: 0.7em;
+            font-size: 0.65em;
             font-weight: bold;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
-            transition: background 0.2s;
         }
-        .set-badge.hidden { display: none; }
+        .badge.hide { display: none; }
+        .last-w { font-size: 0.78em; color: #888; margin-top: 3px; }
 
-        .last-weight { font-size: 0.8em; color: #888; margin-top: 2px; }
-
-        /* Set dots row */
-        .sets-dots {
-            display: flex;
-            gap: 5px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-
-        .set-dot {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7em;
-            color: #888;
-            font-weight: bold;
-        }
-        .set-dot.done {
-            background: var(--check-green);
-            border-color: var(--check-green);
-            color: #000;
-        }
-        .set-dot.prog-done {
-            background: var(--prog-accent);
-            border-color: var(--prog-accent);
-            color: #000;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
+        .input-row { display: flex; gap: 5px; align-items: center; }
         input[type="number"] {
-            width: 75px;
+            width: 72px;
             background: #2a2a2a;
-            border: 1px solid #444;
+            border: 1px solid #555;
             color: var(--accent);
-            padding: 10px 5px;
+            padding: 10px 4px;
             border-radius: 8px;
             text-align: center;
             font-size: 1.1em;
             font-weight: bold;
             outline: none;
-            transition: all 0.2s ease;
         }
-
-        input.is-confirmed {
-            background-color: var(--prog-accent) !important;
-            color: #000 !important;
-            border-color: var(--prog-accent) !important;
-        }
-
         .check-btn {
             background: #2a2a2a;
-            border: 1px solid #444;
-            color: var(--check-green);
-            padding: 10px;
+            border: 1px solid #555;
+            color: var(--green);
+            padding: 10px 12px;
             border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
             font-size: 1em;
+            cursor: pointer;
         }
 
+        /* SET DOTS */
+        .dots-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .dot {
+            width: 30px; height: 26px;
+            border-radius: 6px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65em;
+            color: #666;
+            font-weight: bold;
+        }
+        .dot.done { background: var(--green); border-color: var(--green); color: #000; }
+        .dot.prog-done { background: var(--orange); border-color: var(--orange); color: #000; }
+
+        /* SAVE BTN */
         .save-btn {
+            width: 100%;
             background: var(--accent);
-            color: white;
+            color: #fff;
             border: none;
             padding: 18px;
             border-radius: 12px;
-            width: 100%;
             font-weight: bold;
             font-size: 1.1em;
             margin-top: 10px;
-            transition: all 0.3s ease;
             cursor: pointer;
+            transition: background 0.3s;
         }
-        .save-btn.success { background-color: var(--check-green); }
+        .save-btn.ok { background: var(--green); }
 
-        /* ── Edit Exercise Modal ── */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.75);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-overlay.open { display: flex; }
+        /* VIEWS */
+        #view-main, #view-manage, #view-history { display: none; }
+        #view-main { display: block; }
 
-        .modal {
-            background: #1e1e1e;
-            border-radius: 16px;
-            padding: 24px;
-            width: 90%;
-            max-width: 340px;
-            border: 1px solid #333;
-        }
-        .modal h3 { margin: 0 0 16px; color: var(--accent); font-size: 1em; }
-
-        .modal input[type="text"] {
-            width: 100%;
-            background: #2a2a2a;
-            border: 1px solid #555;
-            color: #fff;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1em;
-            outline: none;
-            margin-bottom: 12px;
-        }
-
-        .modal-row { display: flex; gap: 10px; }
-
-        .modal-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.9em;
-            border: none;
-        }
-        .modal-confirm { background: var(--accent); color: #000; }
-        .modal-cancel { background: #333; color: #aaa; }
-
-        /* ── Manage Exercises View ── */
-        #manage-view { display: none; }
-
+        /* MANAGE */
         .manage-item {
-            background: var(--card-bg);
+            background: var(--card);
             border-radius: 10px;
             padding: 12px 14px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-        .manage-item span {
-            flex: 1;
-            font-size: 1em;
-        }
-        .manage-edit-btn {
+        .manage-item span { flex: 1; font-size: 0.95em; }
+        .btn-edit {
             background: #2a2a2a;
             border: 1px solid var(--accent);
             color: var(--accent);
             padding: 6px 10px;
             border-radius: 6px;
-            font-size: 0.75em;
+            font-size: 0.72em;
             cursor: pointer;
         }
-        .manage-del-btn {
+        .btn-del {
             background: #2a2a2a;
-            border: 1px solid #ff4444;
-            color: #ff4444;
+            border: 1px solid var(--red);
+            color: var(--red);
             padding: 6px 10px;
             border-radius: 6px;
-            font-size: 0.75em;
+            font-size: 0.72em;
             cursor: pointer;
         }
-        .add-ex-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-        .add-ex-row input[type="text"] {
+        .add-row { display: flex; gap: 8px; margin-top: 16px; }
+        .add-row input[type="text"] {
             flex: 1;
             background: #2a2a2a;
             border: 1px solid #555;
             color: #fff;
             padding: 10px;
             border-radius: 8px;
-            font-size: 0.95em;
+            font-size: 0.9em;
             outline: none;
         }
-        .add-ex-btn {
+        .btn-add {
             background: var(--accent);
             color: #000;
             border: none;
@@ -309,313 +203,396 @@
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.9em;
         }
 
-        /* ── History View ── */
-        #history-view { display: none; }
-        .table-wrapper { width: 100%; overflow-x: auto; background: var(--card-bg); border-radius: 12px; }
-        table { width: 100%; border-collapse: collapse; min-width: 450px; }
-        th, td { padding: 12px 8px; border-bottom: 1px solid #333; text-align: center; font-size: 0.85em; }
+        /* HISTORY */
+        .tbl-wrap { overflow-x: auto; background: var(--card); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; min-width: 420px; }
+        th, td { padding: 10px 7px; border-bottom: 1px solid #2a2a2a; text-align: center; font-size: 0.82em; }
         th { color: var(--accent); background: #252525; }
-        .date-col { font-weight: bold; text-align: left; padding-left: 12px; background: #252525; }
-        td.multi { font-size: 0.75em; line-height: 1.6; }
-
+        .dcol { font-weight: bold; text-align: left; padding-left: 12px; background: #252525; }
+        td.multi { font-size: 0.72em; line-height: 1.7; }
         .reset-btn {
-            margin-top: 40px;
-            color: #ff4444;
+            margin-top: 30px;
+            color: var(--red);
             background: none;
-            border: 1px solid #ff4444;
+            border: 1px solid var(--red);
             padding: 12px;
             width: 100%;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
         }
+
+        /* MODAL */
+        .modal-bg {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-bg.open { display: flex; }
+        .modal-box {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 22px;
+            width: 88%;
+            max-width: 320px;
+        }
+        .modal-box h3 { color: var(--accent); margin-bottom: 14px; font-size: 1em; }
+        .modal-box input[type="text"] {
+            width: 100%;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 11px;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            margin-bottom: 14px;
+        }
+        .modal-btns { display: flex; gap: 10px; }
+        .modal-btns button { flex: 1; padding: 11px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.9em; }
+        .mbtn-ok { background: var(--accent); color: #000; }
+        .mbtn-cancel { background: #333; color: #aaa; }
     </style>
 </head>
 <body>
 
-<!-- ── MAIN VIEW ── -->
-<div id="main-view">
+<!-- MAIN -->
+<div id="view-main">
     <div class="header">
-        <div class="header-left">
-            <h2>Workout</h2>
-            <button id="progToggle" class="prog-btn" onclick="toggleProgressive()">Progressiv +2.5</button>
-        </div>
-        <div style="display:flex;gap:6px;">
-            <button class="nav-btn" onclick="showManage()">✏️ Übungen</button>
-            <button class="nav-btn" onclick="showHistory()">📅 Verlauf</button>
+        <h2>Workout</h2>
+        <div class="hbtns">
+            <button id="progBtn" class="btn-prog" onclick="toggleProg()">Progressiv +2.5</button>
+            <button class="btn-outline" onclick="goManage()">✏️ Übungen</button>
+            <button class="btn-outline" onclick="goHistory()">📅 Verlauf</button>
         </div>
     </div>
-    <div id="exercise-list"></div>
+    <div id="ex-list"></div>
     <button id="saveBtn" class="save-btn" onclick="saveWorkout()">Training speichern</button>
 </div>
 
-<!-- ── MANAGE EXERCISES VIEW ── -->
-<div id="manage-view">
+<!-- MANAGE -->
+<div id="view-manage">
     <div class="header">
         <h2>Übungen verwalten</h2>
-        <button class="nav-btn" onclick="showMain()">Zurück</button>
+        <button class="btn-outline" onclick="goMain()">← Zurück</button>
     </div>
     <div id="manage-list"></div>
-    <div class="add-ex-row">
-        <input type="text" id="newExInput" placeholder="Neue Übung..." maxlength="30">
-        <button class="add-ex-btn" onclick="addExercise()">+ Hinzufügen</button>
+    <div class="add-row">
+        <input type="text" id="newExName" placeholder="Neue Übung..." maxlength="28">
+        <button class="btn-add" onclick="addEx()">+ Hinzufügen</button>
     </div>
 </div>
 
-<!-- ── HISTORY VIEW ── -->
-<div id="history-view">
+<!-- HISTORY -->
+<div id="view-history">
     <div class="header">
         <h2>Verlauf</h2>
-        <button class="nav-btn" onclick="showMain()">Zurück</button>
+        <button class="btn-outline" onclick="goMain()">← Zurück</button>
     </div>
-    <div class="table-wrapper">
+    <div class="tbl-wrap">
         <table>
             <thead><tr id="h-head"></tr></thead>
             <tbody id="h-body"></tbody>
         </table>
     </div>
-    <button class="reset-btn" onclick="clearData()">Verlauf leeren</button>
+    <button class="reset-btn" onclick="clearHistory()">Verlauf leeren</button>
 </div>
 
-<!-- ── RENAME MODAL ── -->
-<div id="renameModal" class="modal-overlay">
-    <div class="modal">
+<!-- RENAME MODAL -->
+<div id="modal" class="modal-bg">
+    <div class="modal-box">
         <h3>Übung umbenennen</h3>
-        <input type="text" id="renameInput" maxlength="30" placeholder="Neuer Name...">
-        <div class="modal-row">
-            <button class="modal-btn modal-cancel" onclick="closeRenameModal()">Abbrechen</button>
-            <button class="modal-btn modal-confirm" onclick="confirmRename()">Speichern</button>
+        <input type="text" id="renameVal" maxlength="28" placeholder="Neuer Name...">
+        <div class="modal-btns">
+            <button class="mbtn-cancel" onclick="closeModal()">Abbrechen</button>
+            <button class="mbtn-ok" onclick="doRename()">Speichern</button>
         </div>
     </div>
 </div>
 
 <script>
-    const DEFAULT_EXERCISES = ['Bankdrücken', 'Curls', 'Trizeps', 'Rudern', 'Butterfly revers', 'Butterfly'];
-    const MAX_SETS = 9;
+    // ── State ──
+    var DEFAULTS = ['Bankdrücken','Curls','Trizeps','Rudern','Butterfly revers','Butterfly'];
+    var MAX_SETS = 9;
 
-    let exercises = JSON.parse(localStorage.getItem('exerciseOrder')) || [...DEFAULT_EXERCISES];
-    let isProgressive = false;
-    let workoutHistory = JSON.parse(localStorage.getItem('workoutHistory')) || [];
-    let lastWeights = JSON.parse(localStorage.getItem('lastWeights')) || {};
+    function loadExercises() {
+        try {
+            var s = localStorage.getItem('exerciseOrder');
+            if (s) { var a = JSON.parse(s); if (Array.isArray(a) && a.length > 0) return a; }
+        } catch(e) {}
+        return DEFAULTS.slice();
+    }
+    function loadHistory() {
+        try { var s = localStorage.getItem('workoutHistory'); if (s) return JSON.parse(s); } catch(e) {}
+        return [];
+    }
+    function loadLastWeights() {
+        try { var s = localStorage.getItem('lastWeights'); if (s) return JSON.parse(s); } catch(e) {}
+        return {};
+    }
 
-    // Per-exercise set state: { exerciseName: [ {weight, confirmed}, ... ] }
-    let currentSets = {};
+    var exercises    = loadExercises();
+    var workoutLog      = loadHistory();
+    var lastWeights  = loadLastWeights();
+    var isProgressive = false;
+    var currentSets  = {};   // { exName: [{weight}] }
+    var renamingIdx  = null;
 
-    let renamingIdx = null;
-
-    /* ─── Init ─── */
-    function initCurrentSets() {
-        exercises.forEach(ex => {
+    function initSets() {
+        exercises.forEach(function(ex) {
             if (!currentSets[ex]) currentSets[ex] = [];
         });
     }
 
-    /* ─── Progressive toggle ─── */
-    function toggleProgressive() {
+    // ── Toggle Progressive ──
+    function toggleProg() {
         isProgressive = !isProgressive;
-        document.getElementById('progToggle').classList.toggle('active');
+        var btn = document.getElementById('progBtn');
+        if (isProgressive) btn.classList.add('active'); else btn.classList.remove('active');
         renderExercises();
     }
 
-    /* ─── Confirm a set for exercise idx ─── */
+    // ── Confirm Set ──
     function confirmSet(idx) {
-        const ex = exercises[idx];
-        const input = document.getElementById(`input-${idx}`);
-        let val = input.value.trim();
-
-        // If empty, use placeholder
-        if (val === '' && input.placeholder && input.placeholder !== '--') {
-            val = input.placeholder;
-        }
+        var ex = exercises[idx];
+        var inp = document.getElementById('inp-' + idx);
+        var val = inp.value.trim();
+        if (val === '' && inp.placeholder && inp.placeholder !== '--') val = inp.placeholder;
         if (val === '' || val === '--') return;
-
-        const sets = currentSets[ex] || [];
-        if (sets.length >= MAX_SETS) return; // max 9 sets
-
+        var sets = currentSets[ex] || [];
+        if (sets.length >= MAX_SETS) return;
         sets.push({ weight: val });
         currentSets[ex] = sets;
+        inp.value = '';
 
-        // Clear input for next set
-        input.value = '';
-        input.classList.remove('is-confirmed');
+        // Update badge
+        var badge = document.getElementById('badge-' + idx);
+        badge.textContent = sets.length;
+        if (sets.length > 0) badge.classList.remove('hide'); else badge.classList.add('hide');
 
-        // Update the card without full re-render
-        updateCardUI(idx);
-    }
+        // Update dots
+        renderDots(idx);
 
-    /* ─── Update single card UI after confirming a set ─── */
-    function updateCardUI(idx) {
-        const ex = exercises[idx];
-        const sets = currentSets[ex] || [];
-        const count = sets.length;
-
-        // Badge
-        const badge = document.getElementById(`badge-${idx}`);
-        if (badge) {
-            if (count === 0) {
-                badge.classList.add('hidden');
-            } else {
-                badge.classList.remove('hidden');
-                badge.textContent = count;
-            }
-        }
-
-        // Dots
-        const dotsContainer = document.getElementById(`dots-${idx}`);
-        if (dotsContainer) {
-            dotsContainer.innerHTML = '';
-            for (let s = 0; s < count; s++) {
-                const dot = document.createElement('div');
-                dot.className = isProgressive ? 'set-dot prog-done' : 'set-dot done';
-                dot.textContent = sets[s].weight;
-                dotsContainer.appendChild(dot);
-            }
-            // Empty slots up to 9
-            for (let s = count; s < MAX_SETS; s++) {
-                const dot = document.createElement('div');
-                dot.className = 'set-dot';
-                dot.textContent = s + 1;
-                dotsContainer.appendChild(dot);
-            }
-        }
-
-        // Update placeholder for next set
-        const input = document.getElementById(`input-${idx}`);
-        if (input) {
-            if (count > 0 && isProgressive) {
-                // carry forward last confirmed weight
-                input.placeholder = sets[count - 1].weight;
-            } else {
-                const lw = parseFloat(lastWeights[ex]) || 0;
-                input.placeholder = (isProgressive && lw > 0) ? String(lw + 2.5) : (lastWeights[ex] || '--');
-            }
+        // Update placeholder
+        if (isProgressive && sets.length > 0) {
+            inp.placeholder = sets[sets.length - 1].weight;
         }
     }
 
-    /* ─── Render all exercises ─── */
+    function renderDots(idx) {
+        var ex = exercises[idx];
+        var sets = currentSets[ex] || [];
+        var cont = document.getElementById('dots-' + idx);
+        if (!cont) return;
+        var html = '';
+        for (var s = 0; s < MAX_SETS; s++) {
+            if (s < sets.length) {
+                var cls = isProgressive ? 'dot prog-done' : 'dot done';
+                html += '<div class="' + cls + '">' + sets[s].weight + '</div>';
+            } else {
+                html += '<div class="dot">' + (s + 1) + '</div>';
+            }
+        }
+        cont.innerHTML = html;
+    }
+
+    // ── Render all exercise cards ──
     function renderExercises() {
-        initCurrentSets();
-        const list = document.getElementById('exercise-list');
+        initSets();
+        var list = document.getElementById('ex-list');
+        if (!list) return;
         list.innerHTML = '';
 
-        exercises.forEach((ex, idx) => {
-            const lw = parseFloat(lastWeights[ex]) || 0;
-            const displayLw = lastWeights[ex] || '--';
-            const placeholderValue = (isProgressive && lw > 0) ? (lw + 2.5) : displayLw;
+        exercises.forEach(function(ex, idx) {
+            var lw = lastWeights[ex] || '--';
+            var ph;
+            if (isProgressive) {
+                var lwf = parseFloat(lw);
+                ph = (!isNaN(lwf) && lwf > 0) ? String(lwf + 2.5) : lw;
+            } else {
+                ph = lw;
+            }
 
-            const sets = currentSets[ex] || [];
-            const count = sets.length;
+            var sets = currentSets[ex] || [];
+            var count = sets.length;
 
-            const card = document.createElement('div');
-            card.className = 'exercise-card';
-            const nameClass = isProgressive ? 'exercise-name prog-mode-text' : 'exercise-name';
+            var nameClass = 'ex-name' + (isProgressive ? ' prog' : '');
+            var badgeHide = count === 0 ? ' hide' : '';
 
-            // Build dots HTML
-            let dotsHTML = '';
-            for (let s = 0; s < MAX_SETS; s++) {
+            var dotsHTML = '';
+            for (var s = 0; s < MAX_SETS; s++) {
                 if (s < count) {
-                    const dotClass = isProgressive ? 'set-dot prog-done' : 'set-dot done';
-                    dotsHTML += `<div class="${dotClass}">${sets[s].weight}</div>`;
+                    var dc = isProgressive ? 'dot prog-done' : 'dot done';
+                    dotsHTML += '<div class="' + dc + '">' + sets[s].weight + '</div>';
                 } else {
-                    dotsHTML += `<div class="set-dot">${s + 1}</div>`;
+                    dotsHTML += '<div class="dot">' + (s + 1) + '</div>';
                 }
             }
 
-            card.innerHTML = `
-                <div class="card-top">
-                    <div class="exercise-info">
-                        <div class="name-row">
-                            <span class="${nameClass}" title="${ex}">${ex}</span>
-                            <span id="badge-${idx}" class="set-badge${count === 0 ? ' hidden' : ''}">${count}</span>
-                        </div>
-                        <span class="last-weight">Zuletzt: ${displayLw} kg</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="input-${idx}" class="w-input"
-                               oninput="this.classList.remove('is-confirmed')"
-                               data-name="${ex}" value=""
-                               placeholder="${placeholderValue}"
-                               step="0.5" inputmode="decimal">
-                        <button class="check-btn" onclick="confirmSet(${idx})">✔</button>
-                    </div>
-                </div>
-                <div class="sets-dots" id="dots-${idx}">${dotsHTML}</div>
-            `;
+            var card = document.createElement('div');
+            card.className = 'ex-card';
+            card.innerHTML =
+                '<div class="card-top">' +
+                    '<div class="ex-info">' +
+                        '<div class="name-row">' +
+                            '<span class="' + nameClass + '" title="' + ex + '">' + ex + '</span>' +
+                            '<span id="badge-' + idx + '" class="badge' + badgeHide + '">' + (count || 0) + '</span>' +
+                        '</div>' +
+                        '<div class="last-w">Zuletzt: ' + lw + ' kg</div>' +
+                    '</div>' +
+                    '<div class="input-row">' +
+                        '<input type="number" id="inp-' + idx + '" data-ex="' + ex + '" ' +
+                               'value="" placeholder="' + ph + '" step="0.5" inputmode="decimal">' +
+                        '<button class="check-btn" onclick="confirmSet(' + idx + ')">✔</button>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="dots-row" id="dots-' + idx + '">' + dotsHTML + '</div>';
+
             list.appendChild(card);
         });
     }
 
-    /* ─── Save workout ─── */
+    // ── Save ──
     function saveWorkout() {
-        const btn = document.getElementById('saveBtn');
-        const date = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-
-        // Also pick up any unconfirmed input values
-        exercises.forEach((ex, idx) => {
-            const input = document.getElementById(`input-${idx}`);
-            if (input) {
-                const val = input.value.trim();
-                if (val !== '') {
-                    const sets = currentSets[ex] || [];
-                    if (sets.length < MAX_SETS) {
-                        sets.push({ weight: val });
-                        currentSets[ex] = sets;
-                    }
-                }
+        // Grab any un-confirmed input
+        exercises.forEach(function(ex, idx) {
+            var inp = document.getElementById('inp-' + idx);
+            if (!inp) return;
+            var val = inp.value.trim();
+            if (val !== '') {
+                var sets = currentSets[ex] || [];
+                if (sets.length < MAX_SETS) { sets.push({ weight: val }); currentSets[ex] = sets; }
+                inp.value = '';
             }
         });
 
-        // Check if anything was entered
-        let hasEntry = exercises.some(ex => (currentSets[ex] || []).length > 0);
+        var hasEntry = exercises.some(function(ex) { return (currentSets[ex] || []).length > 0; });
         if (!hasEntry) return;
 
-        const session = { date, weights: {} };
+        var date = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+        var session = { date: date, weights: {} };
 
-        exercises.forEach(ex => {
-            const sets = currentSets[ex] || [];
+        exercises.forEach(function(ex) {
+            var sets = currentSets[ex] || [];
             if (sets.length > 0) {
-                // Store all set weights as array
-                session.weights[ex] = sets.map(s => s.weight);
-                // last weight = last set for next session default
+                session.weights[ex] = sets.map(function(s) { return s.weight; });
                 lastWeights[ex] = sets[sets.length - 1].weight;
             } else {
                 session.weights[ex] = null;
             }
         });
 
-        workoutHistory.unshift(session);
-        localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory));
-        localStorage.setItem('lastWeights', JSON.stringify(lastWeights));
+        workoutLog.unshift(session);
+        try { localStorage.setItem('workoutHistory', JSON.stringify(workoutLog)); } catch(e) {}
+        try { localStorage.setItem('lastWeights', JSON.stringify(lastWeights)); } catch(e) {}
 
-        // Reset current sets
         currentSets = {};
-        initCurrentSets();
+        initSets();
 
-        btn.classList.add('success');
-        btn.innerText = 'Gespeichert! ✓';
-        setTimeout(() => {
-            btn.classList.remove('success');
-            btn.innerText = 'Training speichern';
+        var btn = document.getElementById('saveBtn');
+        btn.classList.add('ok');
+        btn.textContent = 'Gespeichert! ✓';
+        setTimeout(function() {
+            btn.classList.remove('ok');
+            btn.textContent = 'Training speichern';
             renderExercises();
         }, 1000);
     }
 
-    /* ─── History ─── */
-    function showHistory() {
-        document.getElementById('main-view').style.display = 'none';
-        document.getElementById('history-view').style.display = 'block';
+    // ── Views ──
+    function show(id) {
+        ['view-main','view-manage','view-history'].forEach(function(v) {
+            document.getElementById(v).style.display = 'none';
+        });
+        document.getElementById(id).style.display = 'block';
+    }
 
-        const head = document.getElementById('h-head');
-        head.innerHTML = '<th>Datum</th>' + exercises.map(ex => `<th>${ex.substring(0, 5)}.</th>`).join('');
+    function goMain() {
+        show('view-main');
+        initSets();
+        renderExercises();
+    }
 
-        const body = document.getElementById('h-body');
-        body.innerHTML = '';
+    function goManage() {
+        show('view-manage');
+        renderManage();
+    }
 
-        workoutHistory.forEach(s => {
-            let row = `<tr><td class="date-col">${s.date}</td>`;
-            exercises.forEach(ex => {
-                const val = s.weights && s.weights[ex];
-           
+    function goHistory() {
+        show('view-history');
+        renderHistory();
+    }
+
+    // ── Manage ──
+    function renderManage() {
+        var c = document.getElementById('manage-list');
+        c.innerHTML = '';
+        exercises.forEach(function(ex, idx) {
+            var item = document.createElement('div');
+            item.className = 'manage-item';
+            item.innerHTML =
+                '<span>' + ex + '</span>' +
+                '<button class="btn-edit" onclick="openModal(' + idx + ')">✏️ Umbenennen</button>' +
+                '<button class="btn-del" onclick="delEx(' + idx + ')">🗑</button>';
+            c.appendChild(item);
+        });
+    }
+
+    function addEx() {
+        var inp = document.getElementById('newExName');
+        var name = inp.value.trim();
+        if (!name) return;
+        if (exercises.indexOf(name) !== -1) { alert('Übung existiert bereits'); return; }
+        exercises.push(name);
+        saveExList();
+        inp.value = '';
+        renderManage();
+    }
+
+    function delEx(idx) {
+        if (exercises.length <= 1) return;
+        if (!confirm('"' + exercises[idx] + '" löschen?')) return;
+        exercises.splice(idx, 1);
+        saveExList();
+        renderManage();
+    }
+
+    function saveExList() {
+        try { localStorage.setItem('exerciseOrder', JSON.stringify(exercises)); } catch(e) {}
+    }
+
+    // ── Rename Modal ──
+    function openModal(idx) {
+        renamingIdx = idx;
+        document.getElementById('renameVal').value = exercises[idx];
+        document.getElementById('modal').classList.add('open');
+    }
+    function closeModal() {
+        renamingIdx = null;
+        document.getElementById('modal').classList.remove('open');
+    }
+    function doRename() {
+        var newName = document.getElementById('renameVal').value.trim();
+        if (!newName || renamingIdx === null) return;
+        var old = exercises[renamingIdx];
+        if (lastWeights[old] !== undefined) {
+            lastWeights[newName] = lastWeights[old];
+            delete lastWeights[old];
+            try { localStorage.setItem('lastWeights', JSON.stringify(lastWeights)); } catch(e) {}
+        }
+        exercises[renamingIdx] = newName;
+        saveExList();
+        closeModal();
+        renderManage();
+    }
+
+    // ── History ──
+    function renderHistory() {
+        var head = document.getElementById('h-head');
+        head.innerHTML = '<th>Datu
